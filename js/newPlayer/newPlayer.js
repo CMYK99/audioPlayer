@@ -7,15 +7,23 @@ var audioPlayer={
 	config:{
 		'skin':'default',
 	},
+	mi:[
+		'name',
+		'auther'
+	],
 	init:function(config){
 		if(config)  this.loadConfig(config);
 		this.loadSkin();
 		this.createObj();
 	},
-	setMusic:function(obj,url,autoplay){
-		autoplay = autoplay || false;
-		obj.src=url;
-		obj.autoplay=autoplay;
+	setMusic:function(id,url,play,btn,kg,msg,click){
+		this.audio[id].src=url;
+		for(var i=0; i<this.mi.length; i++){
+			console.log($(click).attr('d-'+this.mi[i]))
+			if($(click).attr('d-'+this.mi[i]))
+				$(this.audio[id]).attr('data-'+this.mi[i],$(click).attr('d-'+this.mi[i]))
+		}
+		if(play) this.play(id,btn,kg,msg)
 	},
 	createObj:function(){
 		this.Selecter();
@@ -30,6 +38,11 @@ var audioPlayer={
 			var playMsg=document.createElement('span');
 			var playBtn=this.played[k]=document.createElement('a');
 			var playKg=this.createControls();
+			var playList=this.Player[k].getAttribute('list');
+			for(var i=0;i<this.mi.length;i++){
+				if(this.Player[k].getAttribute('data-'+this.mi[i]))
+					audio.setAttribute('data-'+this.mi[i],this.Player[k].getAttribute('data-'+this.mi[i]))
+			}
 			playBtn.href='javascript:;';
 			playBtn.setAttribute('class','playBtn pause');
 			playBtn.style.width=playBtn.style.height=playBtn.style.lineHeight=playerOffset['h']-16+'px';
@@ -51,6 +64,14 @@ var audioPlayer={
                     that.play(i,obj,playKg,msg)
                 }
             })(k,playBtn,playKg,playMsg,this);
+			if(playList){
+				$(playList).click(function(that,id,btn,kg,msg){
+					return function(){
+						var url=this.getAttribute('d-src');
+						that.setMusic(id,url,true,btn,kg,msg,this);
+					}
+				}(this,k,playBtn,playKg,playMsg))
+			}
 		}
 	},
 	createControls:function(){//进度条
@@ -85,6 +106,7 @@ var audioPlayer={
 						msg.html('正在缓冲……');
 						return true;
 					}
+					msg.html(obj.getAttribute('data-name'));
 					if(isNaN(len) || len<=1){
 						msg.html('音频资源已失效!');
 						clearInterval(that.timeout[id]);
