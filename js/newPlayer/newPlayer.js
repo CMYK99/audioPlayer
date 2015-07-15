@@ -1,8 +1,8 @@
 var audioPlayer={
+	audio:[],
+	played:[],
 	Player:{},
-	audio:new Array(),
-	played:new Array(),
-	timeout:new Array(),
+	timeout:[],
 	tagName:'.newPlayer',
 	config:{
 		'skin':'default',
@@ -16,10 +16,11 @@ var audioPlayer={
 		this.loadSkin();
 		this.createObj();
 	},
+	playList:{},
 	setMusic:function(id,url,play,btn,kg,msg,click){
+		clearInterval(this.timeout[id]);
 		this.audio[id].src=url;
 		for(var i=0; i<this.mi.length; i++){
-			console.log($(click).attr('d-'+this.mi[i]))
 			if($(click).attr('d-'+this.mi[i]))
 				$(this.audio[id]).attr('data-'+this.mi[i],$(click).attr('d-'+this.mi[i]))
 		}
@@ -96,7 +97,7 @@ var audioPlayer={
 		var playTime=pkg.children('.playTime');
 		if(obj.paused){
 			obj.play();
-			$(btn).removeClass('pause stop').addClass('play')
+			$(btn).removeClass('pause stop').addClass('play');
 			this.timeout[id]=setInterval(function(that){
 				return function(){
 					msg.html('');
